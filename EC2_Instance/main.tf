@@ -57,14 +57,15 @@ resource "aws_security_group" "my_terraform_ec2_security_group" {
 
 # my demo instance for terraform practice
 resource "aws_instance" "my_terra_ec2_instance" {
-  ami                    = "ami-0e35ddab05955cf57"
-  instance_type          = "t2.micro"
-  key_name               = aws_key_pair.terraform_ec2_key.key_name                 # refrence of key pair name
-  vpc_security_group_ids = [aws_security_group.my_terraform_ec2_security_group.id] # refrence of security group id in array format because we can have multiple security group in one vpc
+  ami                    = var.ec2_ami_id
+  instance_type          = var.ec2_instance_type
+  key_name               = aws_key_pair.terraform_ec2_key.key_name                 # refrence of key pair name.
+  vpc_security_group_ids = [aws_security_group.my_terraform_ec2_security_group.id] # refrence of security group id in array format because we can have multiple security group in one vpc.
 
+  user_data = file("install_Nginx.sh") # install nginx via user data script at first time of ec2 instance launch.
   root_block_device {
-    volume_size = 15
-    volume_type = "gp3" # General Purpose SSD
+    volume_size = var.ec2_root_volume_size
+    volume_type = var.ec2_root_volume_type # General Purpose SSD.
   }
 
   tags = {
@@ -72,9 +73,4 @@ resource "aws_instance" "my_terra_ec2_instance" {
   }
 }
 
-# output public ip for ec2 instance
-output "ec2_public_ip" {
-  value       = aws_instance.my_terra_ec2_instance.public_ip
-  description = "The public IP address of the EC2 instance"
-}
 
