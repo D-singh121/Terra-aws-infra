@@ -1,4 +1,3 @@
-
 # key pair genrate by ssh-keygen command
 resource "aws_key_pair" "terraform_ec2_key" {
   key_name   = "terraform_ec2_key"
@@ -57,8 +56,20 @@ resource "aws_security_group" "my_terraform_ec2_security_group" {
 
 # my demo instance for terraform practice
 resource "aws_instance" "my_terra_ec2_instance" {
-  ami                    = var.ec2_ami_id
-  instance_type          = var.ec2_instance_type
+  # count                  = 2         # create 2 ec2 instance with same name and configuration
+  # for multiple instance creation with different configuration use for_each
+  for_each = {
+    web     = { ami = "ami-0e35ddab05955cf57", instance_type = "t2.micro", name = "web" }
+    backend = { ami = "ami-0e35ddab05955cf57", instance_type = "t2.medium", name = "backend" }
+
+  }
+
+  # for multiple instance creation
+  ami           = each.value.ami
+  instance_type = each.value.instance_type
+
+  # ami                    = var.ec2_ami_id
+  # instance_type          = var.ec2_instance_type
   key_name               = aws_key_pair.terraform_ec2_key.key_name                 # refrence of key pair name.
   vpc_security_group_ids = [aws_security_group.my_terraform_ec2_security_group.id] # refrence of security group id in array format because we can have multiple security group in one vpc.
 
@@ -69,8 +80,11 @@ resource "aws_instance" "my_terra_ec2_instance" {
   }
 
   tags = {
-    Name = "MyTerraEC2Demo_Instance"
+    # Name = "MyTerraEC2Demo_Instance"
+    Name = each.value.name
   }
+
+  depends_on = [aws_key_pair.terraform_ec2_key] # aws instance depends on key pair creation
 }
 
 
