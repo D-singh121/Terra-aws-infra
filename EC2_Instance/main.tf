@@ -54,13 +54,13 @@ resource "aws_security_group" "my_terraform_ec2_security_group" {
 }
 
 
-# my demo instance for terraform practice
+# my ec2 instance for terraform practice
 resource "aws_instance" "my_terra_ec2_instance" {
   # count                  = 2         # create 2 ec2 instance with same name and configuration
   # for multiple instance creation with different configuration use for_each
   for_each = {
-    web     = { ami = "ami-0e35ddab05955cf57", instance_type = "t2.micro", name = "web" }
-    backend = { ami = "ami-0e35ddab05955cf57", instance_type = "t2.medium", name = "backend" }
+    webApp     = { ami = "ami-0e35ddab05955cf57", instance_type = "t2.micro", name = "webApp" }
+    backend = { ami = "ami-0e35ddab05955cf57", instance_type = "t2.medium", name = "backendApp" }
 
   }
 
